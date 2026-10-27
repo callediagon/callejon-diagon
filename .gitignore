@@ -38,3 +38,5 @@ yarn-error.log
 .env.production.example.bak
 .DS_Store
 Thumbs.db
+.env.local.backup
+.env*.backup
