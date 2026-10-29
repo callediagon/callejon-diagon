@@ -631,6 +631,32 @@ class BankController extends Controller
 
         return response()->json(['message' => 'Cuenta eliminada.']);
     }
+
+        /**
+     * Auditoría: todas las transacciones del colegio (solo director/vice/banquero)
+     */
+    public function allTransactions(Request $request)
+    {
+        $this->authorizeBankStaff($request);
+
+        $transactions = Transaction::with(['user:id,username,name', 'createdBy:id,username,name'])
+            ->orderBy('created_at', 'desc')
+            ->limit(200)
+            ->get()
+            ->map(fn ($t) => [
+                'id' => $t->id,
+                'user_username' => $t->user?->username,
+                'user_name' => $t->user?->name,
+                'type' => $t->type,
+                'amount' => $t->amount,
+                'reason' => $t->reason,
+                'note' => $t->note,
+                'created_by' => $t->createdBy?->username,
+                'created_at' => $t->created_at->toIso8601String(),
+            ]);
+
+        return response()->json(['transactions' => $transactions]);
+    }
     
     // ========================================
     // HELPERS

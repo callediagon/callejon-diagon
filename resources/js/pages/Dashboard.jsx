@@ -52,6 +52,7 @@ export default function Dashboard() {
                             <TabBtn active={tab === 'requests'} onClick={() => setTab('requests')}>Cuentas</TabBtn>
                             <TabBtn active={tab === 'transfers'} onClick={() => setTab('transfers')}>Transferencias</TabBtn>
                             <TabBtn active={tab === 'myhistory'} onClick={() => setTab('myhistory')}>Mi historial</TabBtn>
+                            <TabBtn active={tab === 'audit'} onClick={() => setTab('audit')}>Auditoría</TabBtn>
                             {canApprove && (
                                 <TabBtn active={tab === 'create'} onClick={() => setTab('create')}>Crear</TabBtn>
                             )}
@@ -61,6 +62,7 @@ export default function Dashboard() {
                         {tab === 'requests' && <RequestsList canApprove={canApprove} />}
                         {tab === 'transfers' && <PendingTransfers />}
                         {tab === 'myhistory' && <MyTransactions />}
+                        {tab === 'audit' && <AuditLog />}
                         {tab === 'create' && canApprove && <CreateUserForm />}
                     </div>
                 )}
@@ -845,6 +847,48 @@ function NotificationBell() {
                     </div>
                 </>
             )}
+        </div>
+    );
+}
+
+function AuditLog() {
+    const [data, setData] = useState(null);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        api.get('/api/bank/transactions/all')
+            .then((res) => setData(res.data.transactions))
+            .catch((err) => setError(err.response?.data?.message || 'Error.'));
+    }, []);
+
+    if (error) return <p className="text-red-400 text-sm">{error}</p>;
+    if (!data) return <p className="text-gray-400 text-sm">Cargando...</p>;
+    if (data.length === 0) return <p className="text-gray-400 text-sm">Sin movimientos.</p>;
+
+    return (
+        <div className="space-y-2">
+            {data.map((t) => (
+                <div key={t.id} className="bg-gray-700 rounded-lg p-3">
+                    <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                            <p className="text-sm text-gray-200">
+                                {t.type === 'reversal' && <span className="text-orange-400 font-bold">↩ </span>}
+                                <span className="font-medium">@{t.user_username}</span>
+                                {' · '}
+                                {t.reason}
+                            </p>
+                            {t.note && <p className="text-xs text-gray-400 mt-1">"{t.note}"</p>}
+                            <p className="text-xs text-gray-500 mt-1">
+                                {new Date(t.created_at).toLocaleString('es-ES')}
+                                {t.created_by && <> · por @{t.created_by}</>}
+                            </p>
+                        </div>
+                        <p className={`font-bold whitespace-nowrap ml-2 ${t.amount >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            {t.amount >= 0 ? '+' : ''}{t.amount} 🪙
+                        </p>
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }

@@ -35,6 +35,7 @@ Route::prefix('api')->group(function () {
         Route::post('/bank/users/{user}/toggle-active', [BankController::class, 'toggleActive'])->name('api.bank.toggle-active');
         Route::post('/bank/users/{user}/reset-password', [BankController::class, 'resetPassword'])->name('api.bank.reset-password');
         Route::delete('/bank/users/{user}', [BankController::class, 'deleteUser'])->name('api.bank.delete-user');
+        Route::get('/bank/transactions/all', [BankController::class, 'allTransactions'])->name('api.bank.transactions.all');
         });
 });
 
