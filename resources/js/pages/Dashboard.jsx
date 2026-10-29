@@ -27,7 +27,7 @@ export default function Dashboard() {
 
                 <div className="bg-gray-800 rounded-2xl p-4 mb-4">
                     <p className="text-gray-400 text-sm">Hola, {user.name} · @{user.username} · #{user.account_number}</p>
-                    <p className="text-3xl font-bold text-yellow-400 mt-1">{user.balance} G</p>
+                    <p className="text-3xl font-bold text-yellow-400 mt-1">{user.balance} 🪙</p>
                     <div className="flex flex-wrap gap-1 mt-2">
                         {user.roles.map((r) => (
                             <span key={r} className="bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded-full text-xs">
@@ -758,14 +758,12 @@ function NotificationBell() {
 
     useEffect(() => {
         loadCount();
-        const interval = setInterval(loadCount, 30000); // cada 30s
+        const interval = setInterval(loadCount, 30000);
         return () => clearInterval(interval);
     }, [loadCount]);
 
     const toggleOpen = () => {
-        if (!open) {
-            loadList();
-        }
+        if (!open) loadList();
         setOpen(!open);
     };
 
@@ -795,8 +793,10 @@ function NotificationBell() {
             {open && (
                 <>
                     <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-gray-800 rounded-2xl shadow-xl z-50">
-                        <div className="flex justify-between items-center p-3 border-b border-gray-700">
+                    <div
+                        className="fixed left-2 right-2 top-16 z-50 bg-gray-800 rounded-2xl shadow-xl max-h-[70vh] overflow-y-auto sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-80 sm:max-h-96"
+                    >
+                        <div className="flex justify-between items-center p-3 border-b border-gray-700 sticky top-0 bg-gray-800">
                             <h3 className="font-bold text-yellow-400">Notificaciones</h3>
                             <button onClick={markAll} className="text-xs text-gray-400 hover:text-white">
                                 Marcar todas leídas
@@ -817,7 +817,7 @@ function NotificationBell() {
                                 <p className={`text-sm ${!n.is_read ? 'font-bold text-white' : 'text-gray-300'}`}>
                                     {n.title}
                                 </p>
-                                <p className="text-xs text-gray-400 mt-1">{n.message}</p>
+                                <p className="text-xs text-gray-400 mt-1 break-words">{n.message}</p>
                                 <p className="text-xs text-gray-500 mt-1">
                                     {new Date(n.created_at).toLocaleString('es-ES')}
                                 </p>
