@@ -336,6 +336,20 @@ class BankController extends Controller
             'message' => 'Solicitud de transferencia creada. Esperando aprobación del banquero.',
             'id' => $transfer->id,
         ], 201);
+
+                // Notificar a banqueros, vices y directores
+        $approvers = User::whereHas('roles', function ($q) {
+            $q->whereIn('slug', ['banquero', 'vice', 'director']);
+        })->where('id', '!=', $from->id)->get();
+
+        foreach ($approvers as $approver) {
+            Notification::notify(
+                $approver->id,
+                'transfer_request_pending',
+                'Transferencia por aprobar',
+                '@' . $from->username . ' quiere enviar ' . $data['amount'] . ' 🪙 a @' . $to->username . '.'
+            );
+        }
     }
 
     public function myTransfers(Request $request)
@@ -582,6 +596,42 @@ class BankController extends Controller
         return response()->json(['message' => 'Contraseña actualizada.']);
     }
 
+        /**
+     * Director elimina una cuenta (soft delete)
+     */
+    public function deleteUser(Request $request, User $user)
+    {
+        $director = $request->user();
+
+        if (!$director || !$director->hasRole('director')) {
+            abort(403, 'Solo el director puede eliminar cuentas.');
+        }
+
+        if ($user->id === $director->id) {
+            throw ValidationException::withMessages([
+                'user' => ['No puedes eliminarte a ti mismo.'],
+            ]);
+        }
+
+        if ($user->hasRole('director') && $user->id !== $director->id) {
+            throw ValidationException::withMessages([
+                'user' => ['No puedes eliminar a otro director.'],
+            ]);
+        }
+
+        $username = $user->username;
+        $user->delete();
+
+        Notification::notify(
+            $director->id,
+            'user_deleted',
+            'Cuenta eliminada',
+            'La cuenta @' . $username . ' fue eliminada.'
+        );
+
+        return response()->json(['message' => 'Cuenta eliminada.']);
+    }
+    
     // ========================================
     // HELPERS
     // ========================================

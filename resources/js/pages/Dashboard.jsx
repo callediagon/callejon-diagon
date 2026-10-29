@@ -293,6 +293,17 @@ function UsersList() {
         }
     };
 
+    const deleteUser = async (u) => {
+        if (!confirm(`¿Eliminar definitivamente la cuenta de @${u.username}? Esta acción no se puede deshacer desde la UI.`)) return;
+        if (!confirm(`⚠️ CONFIRMAR: Se eliminará @${u.username}. ¿Continuar?`)) return;
+        try {
+            await api.delete(`/api/bank/users/${u.id}`);
+            load();
+        } catch (err) {
+            alert(err.response?.data?.message || 'Error.');
+        }
+    };
+
     if (error) return <p className="text-red-400 text-sm">{error}</p>;
     if (!users) return <p className="text-gray-400 text-sm">Cargando...</p>;
 
@@ -344,6 +355,14 @@ function UsersList() {
                                     }`}
                                 >
                                     {u.is_active ? '⛔ Desactivar' : '✅ Activar'}
+                                </button>
+                            )}
+                            {me.roles.includes('director') && u.id !== me.id && !u.roles.includes('director') && (
+                                <button
+                                    onClick={() => deleteUser(u)}
+                                    className="col-span-2 text-xs py-2 rounded bg-gray-800 hover:bg-gray-900 text-red-400 border border-red-800"
+                                >
+                                    🗑️ Eliminar cuenta
                                 </button>
                             )}
                         </div>
