@@ -37,6 +37,9 @@ Route::prefix('api')->group(function () {
         });
 });
 
+// Registro público (no requiere auth)
+Route::post('/api/register', [\App\Http\Controllers\Auth\RegisterController::class, 'register'])->name('api.register');
+
 // Ping
 Route::get('/ping', function () {
     return response()->json(['status' => 'ok', 'time' => now()]);

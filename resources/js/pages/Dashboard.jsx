@@ -135,7 +135,7 @@ function TransferForm() {
     return (
         <form onSubmit={submit} className="space-y-3">
             <p className="text-gray-400 text-xs">
-                Saldo actual: <span className="text-yellow-400 font-bold">{user.balance} G</span>
+                Saldo actual: <span className="text-yellow-400 font-bold">{user.balance} 🪙</span>
                 <br />(transferir más del saldo se permite, pero el banquero decide)
             </p>
 
@@ -143,6 +143,17 @@ function TransferForm() {
             {error && <div className="bg-red-900/50 text-red-200 text-sm rounded p-2">{error}</div>}
 
             <input value={toUsername} onChange={(e) => setToUsername(e.target.value)} placeholder="Usuario o #cuenta (ej: harry o 002)" className="w-full bg-gray-700 text-white rounded-lg px-4 py-3" required />
+
+            <input
+                type="number"
+                min="1"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="Cantidad de galeones"
+                className="w-full bg-gray-700 text-white rounded-lg px-4 py-3"
+                required
+            />
+
             <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Motivo (opcional)" className="w-full bg-gray-700 text-white rounded-lg px-4 py-3" />
 
             <button type="submit" disabled={loading} className="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold rounded-lg py-3 disabled:opacity-50">
@@ -189,7 +200,7 @@ function MyTransfers() {
                     <div className="flex justify-between">
                         <span className="text-gray-400">{t.dir === 'sent' ? '→' : '←'} @{t.dir === 'sent' ? t.to_username : t.from_username}</span>
                         <span className={`font-bold ${t.dir === 'sent' ? 'text-red-400' : 'text-green-400'}`}>
-                            {t.dir === 'sent' ? '-' : '+'}{t.amount} G
+                            {t.dir === 'sent' ? '-' : '+'}{t.amount} 🪙
                         </span>
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
@@ -240,7 +251,7 @@ function PendingTransfers() {
                         <span className="text-gray-300">@{t.from_username}</span>
                         <span className="text-gray-500"> → </span>
                         <span className="text-gray-300">@{t.to_username}</span>
-                        <span className="float-right font-bold text-yellow-400">{t.amount} G</span>
+                        <span className="float-right font-bold text-yellow-400">{t.amount} 🪙</span>
                     </div>
                     {t.reason && <p className="text-xs text-gray-400 mt-1">"{t.reason}"</p>}
                     <p className="text-xs text-gray-500 mt-1">
@@ -301,7 +312,7 @@ function UsersList() {
                                     {!u.is_active && <span className="text-red-400"> · inactivo</span>}
                                 </p>
                             </div>
-                            <p className="font-bold text-yellow-400 whitespace-nowrap">{u.balance} G</p>
+                            <p className="font-bold text-yellow-400 whitespace-nowrap">{u.balance} 🪙</p>
                         </div>
                         {u.roles.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-2">
@@ -476,7 +487,7 @@ function AdjustBalanceModal({ user, onClose, onSuccess }) {
                 </div>
 
                 <p className="text-gray-400 text-sm mb-4">
-                    {user.name} · @{user.username} · <span className="text-yellow-400 font-bold">{user.balance} G</span>
+                    {user.name} · @{user.username} · <span className="text-yellow-400 font-bold">{user.balance} 🪙</span>
                 </p>
 
                 {error && (
@@ -536,7 +547,7 @@ function AdjustBalanceModal({ user, onClose, onSuccess }) {
                         disabled={loading}
                         className="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold rounded-lg py-3 disabled:opacity-50"
                     >
-                        {loading ? 'Aplicando...' : `Aplicar ${direction === 'credit' ? '+' : '-'}${amount || 0} G`}
+                        {loading ? 'Aplicando...' : `Aplicar ${direction === 'credit' ? '+' : '-'}${amount || 0} 🪙`}
                     </button>
                 </form>
             </div>
@@ -584,7 +595,9 @@ function RequestsList({ canApprove }) {
             {requests.map((r) => (
                 <div key={r.id} className="bg-gray-700 rounded-lg p-3">
                     <p className="font-medium">{r.name} {r.last_name || ''}</p>
-                    <p className="text-xs text-gray-400">@{r.username} · pedido por @{r.requested_by}</p>
+                    <p className="text-xs text-gray-400">
+                        @{r.username} · {r.requested_by ? `pedido por @${r.requested_by}` : 'autorregistro'}
+                    </p>
                     {canApprove && (
                         <div className="flex gap-2 mt-2">
                             <button onClick={() => approve(r.id)} className="flex-1 bg-green-700 hover:bg-green-600 py-2 rounded text-sm">Aprobar</button>
@@ -709,7 +722,7 @@ function MyTransactions() {
                             </p>
                         </div>
                         <p className={`font-bold whitespace-nowrap ml-2 ${t.amount >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                            {t.amount >= 0 ? '+' : ''}{t.amount} G
+                            {t.amount >= 0 ? '+' : ''}{t.amount} 🪙
                         </p>
                     </div>
                     {t.can_reverse && (

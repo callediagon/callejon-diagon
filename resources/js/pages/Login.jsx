@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import Register from './Register';
 
 export default function Login() {
     const { login } = useAuth();
@@ -7,6 +8,11 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [showRegister, setShowRegister] = useState(false);
+
+    if (showRegister) {
+        return <Register onBack={() => setShowRegister(false)} />;
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -66,6 +72,14 @@ export default function Login() {
                     className="w-full bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold rounded-lg py-3 disabled:opacity-50"
                 >
                     {loading ? 'Entrando...' : 'Entrar'}
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => setShowRegister(true)}
+                    className="w-full mt-3 text-gray-400 hover:text-yellow-400 text-sm py-2"
+                >
+                    ¿No tienes cuenta? Regístrate
                 </button>
             </form>
         </div>

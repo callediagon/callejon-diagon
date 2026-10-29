@@ -89,7 +89,7 @@ class BankController extends Controller
             $user->id,
             'balance_adjusted',
             'Ajuste de saldo',
-            'Se te han ' . $direction . ' ' . abs($signedAmount) . ' G. Motivo: ' . $data['reason']
+            'Se te han ' . $direction . ' ' . abs($signedAmount) . ' 🪙. Motivo: ' . $data['reason']
         );
 
         return response()->json([
@@ -243,7 +243,7 @@ class BankController extends Controller
             'password' => 'required|string|min:8|max:255',
             'role' => 'required|in:estudiante,banquero,jefe_casa,moderador,vice,director',
         ]);
-        $newUser = DB::transaction(function () use ($data, $reviewer) {
+                $newUser = DB::transaction(function () use ($data, $reviewer) {
             $newUser = User::create([
                 'account_number' => User::nextAvailableAccountNumber(),
                 'username' => $data['username'],
@@ -254,15 +254,16 @@ class BankController extends Controller
             ]);
             $role = Role::where('slug', $data['role'])->firstOrFail();
             $newUser->roles()->attach($role->id);
-            if ($data['role'] === 'estudiante') {
-                Transaction::create([
-                    'user_id' => $newUser->id,
-                    'created_by' => $reviewer->id,
-                    'type' => 'credit',
-                    'amount' => 30,
-                    'reason' => 'Bienvenida',
-                ]);
-            }
+
+            // TODOS los roles empiezan con 30 G
+            Transaction::create([
+                'user_id' => $newUser->id,
+                'created_by' => $reviewer->id,
+                'type' => 'credit',
+                'amount' => 30,
+                'reason' => 'Bienvenida',
+            ]);
+
             return $newUser;
         });
         return response()->json([
@@ -414,14 +415,14 @@ class BankController extends Controller
             $transferRequest->from_user_id,
             'transfer_approved',
             'Transferencia aprobada',
-            'Tu transferencia de ' . $transferRequest->amount . ' G a @' . $transferRequest->toUser->username . ' fue aprobada.'
+            'Tu transferencia de ' . $transferRequest->amount . ' 🪙 a @' . $transferRequest->toUser->username . ' fue aprobada.'
         );
 
         Notification::notify(
             $transferRequest->to_user_id,
             'transfer_received',
             'Transferencia recibida',
-            'Has recibido ' . $transferRequest->amount . ' G de @' . $transferRequest->fromUser->username . '.'
+            'Has recibido ' . $transferRequest->amount . ' 🪙 de @' . $transferRequest->fromUser->username . '.'
         );
         return response()->json(['message' => 'Transferencia aprobada.']);
     }
@@ -441,7 +442,7 @@ class BankController extends Controller
             $transferRequest->from_user_id,
             'transfer_rejected',
             'Transferencia rechazada',
-            'Tu transferencia de ' . $transferRequest->amount . ' G a @' . $transferRequest->toUser->username . ' fue rechazada.'
+            'Tu transferencia de ' . $transferRequest->amount . ' 🪙 a @' . $transferRequest->toUser->username . ' fue rechazada.'
         );
         return response()->json(['message' => 'Transferencia rechazada.']);
     }
@@ -518,7 +519,7 @@ class BankController extends Controller
             $transaction->user_id,
             'transaction_reversed',
             'Transacción revertida',
-            'Se ha revertido una transacción de ' . $transaction->amount . ' G. Motivo: ' . $data['reason']
+            'Se ha revertido una transacción de ' . $transaction->amount . ' 🪙. Motivo: ' . $data['reason']
         );
 
         return response()->json([
