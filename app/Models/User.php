@@ -144,14 +144,18 @@ class User extends Authenticatable
      */
     public static function nextAvailableAccountNumber(): string
     {
-        $used = self::whereNotNull('account_number')
+        // withTrashed() incluye a los eliminados (soft delete).
+        // Así el método ve los MISMOS números que ve el constraint unique de la DB.
+        $used = self::withTrashed()
+            ->whereNotNull('account_number')
             ->pluck('account_number')
             ->map(fn ($n) => (int) $n)
-            ->flip() // [num => index] para búsqueda O(1)
             ->all();
 
+        $usedSet = array_flip($used); // [num => índice] para búsqueda O(1)
+
         for ($i = 1; $i <= 999999999; $i++) {
-            if (!isset($used[$i])) {
+            if (!isset($usedSet[$i])) {
                 return $i <= 999
                     ? str_pad((string) $i, 3, '0', STR_PAD_LEFT)
                     : (string) $i;
