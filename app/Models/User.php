@@ -95,6 +95,26 @@ class User extends Authenticatable
         return $this->hasMany(Notification::class)->where('is_read', false);
     }
 
+    public function shops()
+    {
+        return $this->belongsToMany(Shop::class)->withTimestamps();
+    }
+
+    public function purchases()
+    {
+        return $this->hasMany(Purchase::class);
+    }
+
+    public function inventory()
+    {
+        return $this->hasMany(Inventory::class);
+    }
+
+    public function usageReceipts()
+    {
+        return $this->hasMany(UsageReceipt::class);
+    }
+
     // ========================================
     // HELPERS DE ROLES
     // ========================================

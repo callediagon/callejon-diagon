@@ -36,6 +36,12 @@ Route::prefix('api')->group(function () {
         Route::post('/bank/users/{user}/reset-password', [BankController::class, 'resetPassword'])->name('api.bank.reset-password');
         Route::delete('/bank/users/{user}', [BankController::class, 'deleteUser'])->name('api.bank.delete-user');
         Route::get('/bank/transactions/all', [BankController::class, 'allTransactions'])->name('api.bank.transactions.all');
+        // Tiendas
+        Route::get('/shops', [App\Http\Controllers\Api\ShopController::class, 'index']);
+        Route::get('/shops/mine', [App\Http\Controllers\Api\ShopController::class, 'myShops']);
+        Route::get('/shops/{slug}', [App\Http\Controllers\Api\ShopController::class, 'show']);
+        Route::get('/shops/{slug}/products', [App\Http\Controllers\Api\ProductController::class, 'index']);
+        Route::post('/shops/{slug}/products', [App\Http\Controllers\Api\ProductController::class, 'store']);
         });
 });
 
